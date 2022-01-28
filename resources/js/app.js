@@ -1,6 +1,13 @@
 import Vue from 'vue'
 import router from './router'
 import Swal from 'sweetalert2'
+import VueProgressBar from 'vue-progressbar'
+
+Vue.use(VueProgressBar, {
+    color: 'rgb(143, 255, 199)',
+    failedColor: 'red',
+    height: '2px'
+})
 
 const Toast = Swal.mixin({
     toast: true,

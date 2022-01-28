@@ -1,6 +1,11 @@
 <template>
     <div>
         <div class="home">
+            <loading :active.sync="isLoading" 
+                :can-cancel="true" 
+                :on-cancel="onCancel"
+                :is-full-page="fullPage">
+            </loading>
             <h1>Project Planner</h1>
             <FilterNav @filterBy="current = $event" :current="current"></FilterNav>
             <div v-for="project in filterByName" :key="project.id">
@@ -11,14 +16,19 @@
 </template>
 
 <script>
+// Import component
+import Loading from 'vue-loading-overlay';
+// Import stylesheet
+import 'vue-loading-overlay/dist/vue-loading.css';
 import FilterNav from '../components/FilterNav'
 import SingleProject from './SingleProject'
 import axios from 'axios'
 export default {
   components: {
-    FilterNav, SingleProject },
+    FilterNav, SingleProject, Loading },
     data(){
         return{
+            isLoading: false,
             projects : [],
             current: 'all'
         }
@@ -28,9 +38,18 @@ export default {
     },
     methods:{
         view(){
+            this.$Progress.start()
+            this.isLoading = true;
             axios.get('api/projects')
-        .then((response) => this.projects = response.data)
-        .catch((error) => console.log(error))
+        .then((response) => {
+            this.projects = response.data
+            setTimeout(() => {
+                this.isLoading = false
+            },3000)
+                this.$Progress.finish()
+            }
+        )
+        .catch((error) => this.$Progress.fail())
         },
 
         deleteProject(id){
